@@ -19,26 +19,27 @@ package com.example.dreamrat.screens
 // - Live Data
 // - Navigation
 // ============================================================
-
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.dreamrat.R
 
 // ============================================================
 // COLORS
@@ -228,14 +229,149 @@ fun HomeScreen() {
 // one by one in the next parts.
 // ============================================================
 
+// ============================================================
+// TOP BAR
+//
+// Inspired by the approved DreamRAT reference design.
+//
+// Future:
+// Menu button,
+// Notification,
+// Logo click,
+// Drawer Navigation.
+//
+// ============================================================
+
 @Composable
 private fun TopBar() {
 
-    Text(
-        text = "TopBar",
-        color = TextWhite,
-        style = MaterialTheme.typography.titleLarge
-    )
+    Row(
+
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp),
+
+        verticalAlignment = Alignment.CenterVertically
+
+    ) {
+
+        // =============================
+        // MENU BUTTON
+        // =============================
+
+        Card(
+
+            shape = CircleShape,
+
+            colors = CardDefaults.cardColors(
+                containerColor = CardColor
+            )
+
+        ) {
+
+            IconButton(
+                onClick = { }
+            ) {
+
+                Icon(
+                    imageVector = Icons.Outlined.Menu,
+                    contentDescription = null,
+                    tint = TextWhite
+                )
+
+            }
+
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        // =============================
+        // LOGO
+        // =============================
+
+        Image(
+
+            painter = painterResource(id = R.drawable.splash_image),
+
+            contentDescription = null,
+
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape),
+
+            contentScale = ContentScale.Crop
+
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        // =============================
+        // TITLE
+        // =============================
+
+        Column(
+
+            modifier = Modifier.weight(1f)
+
+        ) {
+
+            Text(
+
+                text = "DreamRAT",
+
+                color = PrimaryRed,
+
+                fontSize = 22.sp,
+
+                fontWeight = FontWeight.Bold
+
+            )
+
+            Text(
+
+                text = "Mobile Control Center",
+
+                color = TextGray,
+
+                fontSize = 12.sp
+
+            )
+
+        }
+
+        // =============================
+        // NOTIFICATION
+        // =============================
+
+        Card(
+
+            shape = CircleShape,
+
+            colors = CardDefaults.cardColors(
+                containerColor = CardColor
+            )
+
+        ) {
+
+            IconButton(
+                onClick = { }
+            ) {
+
+                Icon(
+
+                    imageVector = Icons.Outlined.Notifications,
+
+                    contentDescription = null,
+
+                    tint = TextWhite
+
+                )
+
+            }
+
+        }
+
+    }
 
 }
 
@@ -296,5 +432,4 @@ private fun RecentDevicesSection() {
 private fun HomeScreenPreview() {
 
     HomeScreen()
-
 }
