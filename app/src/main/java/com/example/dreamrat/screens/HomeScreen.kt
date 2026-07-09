@@ -16,18 +16,20 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Smartphone
-import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -105,13 +107,12 @@ private fun TopBar() {
 }
 
 // ============================================================
-// DEVICE OVERVIEW CARD - UPDATED DESIGN
+// DEVICE OVERVIEW CARD
 // ============================================================
 
 @Composable
 private fun DeviceOverviewCard() {
     Column {
-        // Section Title with Dot
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(PrimaryRed))
             Spacer(modifier = Modifier.width(8.dp))
@@ -135,7 +136,6 @@ private fun DeviceOverviewCard() {
             Column(modifier = Modifier.padding(16.dp)) {
                 
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    // Left Column: Stats
                     Column(modifier = Modifier.weight(1f)) {
                         StatItem(Icons.Default.Smartphone, "Total Devices", "8", TextWhite)
                         Spacer(modifier = Modifier.height(12.dp))
@@ -144,7 +144,6 @@ private fun DeviceOverviewCard() {
                         StatItemWithDot(OfflineRed, "Offline", "5")
                     }
 
-                    // Right Side: Active Sessions Badge & Map Placeholder
                     Column(horizontalAlignment = Alignment.End) {
                         Surface(
                             shape = RoundedCornerShape(4.dp),
@@ -161,7 +160,6 @@ private fun DeviceOverviewCard() {
                             }
                         }
                         
-                        // Placeholder for World Map Image
                         Spacer(modifier = Modifier.height(10.dp))
                         Box(
                             modifier = Modifier.size(150.dp, 80.dp),
@@ -174,7 +172,6 @@ private fun DeviceOverviewCard() {
 
                 Spacer(modifier = Modifier.height(20.dp))
                 
-                // Bottom Row: Status and Switch
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -198,7 +195,15 @@ private fun DeviceOverviewCard() {
                                 uncheckedThumbColor = TextGray,
                                 uncheckedTrackColor = Color.DarkGray
                             ),
-                            modifier = Modifier.scale(0.7f)
+                            modifier = Modifier.layout { measurable, constraints ->
+                                val placeable = measurable.measure(constraints)
+                                layout(placeable.width, placeable.height) {
+                                    placeable.placeRelativeWithLayer(0, 0) {
+                                        this.scaleX = 0.7f
+                                        this.scaleY = 0.7f
+                                    }
+                                }
+                            }
                         )
                     }
                 }
@@ -206,6 +211,104 @@ private fun DeviceOverviewCard() {
         }
     }
 }
+
+// ============================================================
+// QUICK ACTIONS SECTION - EXACT MATCH TO IMAGE (5 COLUMNS)
+// ============================================================
+
+@Composable
+private fun QuickActionsSection() {
+    Column {
+        // Section Title
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(PrimaryRed))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "QUICK ACTIONS",
+                color = PrimaryRed,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.5.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Grid of actions - 5 columns per row to match image
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // First Row
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ActionCard(Icons.Outlined.Visibility, "Live Screen", "View Live")
+                ActionCard(Icons.Outlined.Chat, "Remote Chat", "Start Chat")
+                ActionCard(Icons.Outlined.PhotoCamera, "Camera", "Take Photo")
+                ActionCard(Icons.Outlined.Mic, "Microphone", "Listen Live")
+                ActionCard(Icons.Outlined.FolderOpen, "File Manager", "Browse Files")
+            }
+            // Second Row
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ActionCard(Icons.Outlined.LocationOn, "Location", "Track Device")
+                ActionCard(Icons.Outlined.Lock, "Lock Device", "Lock Now")
+                ActionCard(Icons.Outlined.NotificationsActive, "Send Alert", "Notify Device")
+                ActionCard(Icons.Outlined.DeleteOutline, "Clear Data", "Clear All")
+                ActionCard(Icons.Outlined.Settings, "More Tools", "Advanced")
+            }
+        }
+    }
+}
+
+@Composable
+private fun RowScope.ActionCard(icon: ImageVector, title: String, subtitle: String) {
+    Card(
+        modifier = Modifier
+            .weight(1f)
+            .height(85.dp),
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = CardColor),
+        border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.1f))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(2.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = PrimaryRed,
+                modifier = Modifier.size(20.dp)
+            )
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Text(
+                text = title,
+                color = TextWhite,
+                fontSize = 9.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                lineHeight = 10.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            
+            Text(
+                text = subtitle,
+                color = TextGray,
+                fontSize = 8.sp,
+                textAlign = TextAlign.Center,
+                lineHeight = 9.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+// ============================================================
+// OTHER SECTIONS
+// ============================================================
 
 @Composable
 private fun StatItem(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, value: String, valueColor: Color) {
@@ -246,13 +349,6 @@ private fun StatItemWithDot(dotColor: Color, label: String, value: String) {
 }
 
 @Composable
-private fun QuickActionsSection() {
-    Box(modifier = Modifier.fillMaxWidth().height(200.dp).background(CardColor)) {
-        Text("Quick Actions Placeholder", color = TextGray, modifier = Modifier.align(Alignment.Center))
-    }
-}
-
-@Composable
 private fun ActivityOverviewSection() {
     Box(modifier = Modifier.fillMaxWidth().height(100.dp).background(CardColor)) {
         Text("Activity Overview Placeholder", color = TextGray, modifier = Modifier.align(Alignment.Center))
@@ -265,19 +361,6 @@ private fun RecentDevicesSection() {
         Text("Recent Devices Placeholder", color = TextGray, modifier = Modifier.align(Alignment.Center))
     }
 }
-
-// Helper to scale components
-private fun Modifier.scale(scale: Float): Modifier = this.then(
-    Modifier.layout { measurable, constraints ->
-        val placeable = measurable.measure(constraints)
-        layout(placeable.width, placeable.height) {
-            placeable.placeRelativeWithLayer(0, 0) {
-                this.scaleX = scale
-                this.scaleY = scale
-            }
-        }
-    }
-)
 
 @Preview(showBackground = true)
 @Composable
