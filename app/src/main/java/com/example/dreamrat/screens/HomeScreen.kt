@@ -199,8 +199,8 @@ private fun DeviceOverviewCard() {
                                 val placeable = measurable.measure(constraints)
                                 layout(placeable.width, placeable.height) {
                                     placeable.placeRelativeWithLayer(0, 0) {
-                                        this.scaleX = 0.7f
-                                        this.scaleY = 0.7f
+                                        scaleX = 0.7f
+                                        scaleY = 0.7f
                                     }
                                 }
                             }
@@ -213,13 +213,12 @@ private fun DeviceOverviewCard() {
 }
 
 // ============================================================
-// QUICK ACTIONS SECTION - EXACT MATCH TO IMAGE (5 COLUMNS)
+// QUICK ACTIONS SECTION
 // ============================================================
 
 @Composable
 private fun QuickActionsSection() {
     Column {
-        // Section Title
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(PrimaryRed))
             Spacer(modifier = Modifier.width(8.dp))
@@ -234,9 +233,7 @@ private fun QuickActionsSection() {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Grid of actions - 5 columns per row to match image
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            // First Row
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ActionCard(Icons.Outlined.Visibility, "Live Screen", "View Live")
                 ActionCard(Icons.Outlined.Chat, "Remote Chat", "Start Chat")
@@ -244,7 +241,6 @@ private fun QuickActionsSection() {
                 ActionCard(Icons.Outlined.Mic, "Microphone", "Listen Live")
                 ActionCard(Icons.Outlined.FolderOpen, "File Manager", "Browse Files")
             }
-            // Second Row
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ActionCard(Icons.Outlined.LocationOn, "Location", "Track Device")
                 ActionCard(Icons.Outlined.Lock, "Lock Device", "Lock Now")
@@ -307,11 +303,105 @@ private fun RowScope.ActionCard(icon: ImageVector, title: String, subtitle: Stri
 }
 
 // ============================================================
-// OTHER SECTIONS
+// ACTIVITY OVERVIEW SECTION - EXACT MATCH TO IMAGE
 // ============================================================
 
 @Composable
-private fun StatItem(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, value: String, valueColor: Color) {
+private fun ActivityOverviewSection() {
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(PrimaryRed))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "ACTIVITY OVERVIEW",
+                    color = PrimaryRed,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.5.sp
+                )
+            }
+            Text(
+                text = "View All >",
+                color = TextGray,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            ActivityCard(Icons.Outlined.Send, "Sent", "2.45 MB", "↑ 12%", PrimaryRed)
+            ActivityCard(Icons.Outlined.FileDownload, "Received", "5.32 MB", "↓ 8%", Color(0xFFFFB74D))
+            ActivityCard(Icons.Outlined.Call, "Calls", "24", "↑ 5%", OnlineGreen)
+            ActivityCard(Icons.Outlined.Chat, "SMS", "36", "↑ 3%", Color(0xFF4DD0E1))
+        }
+    }
+}
+
+@Composable
+private fun RowScope.ActivityCard(
+    icon: ImageVector,
+    label: String,
+    value: String,
+    trend: String,
+    iconColor: Color
+) {
+    Card(
+        modifier = Modifier.weight(1f).height(105.dp),
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = CardColor),
+        border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.1f))
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(8.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(CircleShape)
+                    .background(iconColor.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = iconColor,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            
+            Column {
+                Text(text = label, color = TextGray, fontSize = 9.sp)
+                Text(
+                    text = value,
+                    color = TextWhite,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(text = trend, color = iconColor, fontSize = 8.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+// ============================================================
+// OTHER COMPONENTS
+// ============================================================
+
+@Composable
+private fun StatItem(icon: ImageVector, label: String, value: String, valueColor: Color) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Surface(
             modifier = Modifier.size(32.dp),
@@ -345,13 +435,6 @@ private fun StatItemWithDot(dotColor: Color, label: String, value: String) {
             Text(label, color = TextGray, fontSize = 10.sp)
             Text(value, color = TextWhite, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
-    }
-}
-
-@Composable
-private fun ActivityOverviewSection() {
-    Box(modifier = Modifier.fillMaxWidth().height(100.dp).background(CardColor)) {
-        Text("Activity Overview Placeholder", color = TextGray, modifier = Modifier.align(Alignment.Center))
     }
 }
 
