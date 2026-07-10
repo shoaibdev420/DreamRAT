@@ -7,6 +7,14 @@ package com.example.dreamrat.screens
 //
 // Current Status: UI Overhaul to match reference image.
 // ============================================================
+import androidx.compose.foundation.Image
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Surface
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,7 +22,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.Smartphone
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -23,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
@@ -51,13 +58,21 @@ private val TextGray = Color(0xFF808080)
 @Composable
 fun HomeScreen() {
     Scaffold(
-        containerColor = BackgroundColor
+        containerColor = BackgroundColor,
+                bottomBar = {
+            BottomNavigationBar()
+        }
     ) { padding ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
-            contentPadding = PaddingValues(16.dp),
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                top = 16.dp,
+                end = 16.dp,
+                bottom = 100.dp
+            ),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item { TopBar() }
@@ -303,7 +318,7 @@ private fun RowScope.ActionCard(icon: ImageVector, title: String, subtitle: Stri
 }
 
 // ============================================================
-// ACTIVITY OVERVIEW SECTION - EXACT MATCH TO IMAGE
+// ACTIVITY OVERVIEW SECTION
 // ============================================================
 
 @Composable
@@ -397,6 +412,139 @@ private fun RowScope.ActivityCard(
 }
 
 // ============================================================
+// RECENT DEVICES SECTION - EXACT MATCH TO IMAGE
+// ============================================================
+
+@Composable
+private fun RecentDevicesSection() {
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(PrimaryRed))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "RECENT DEVICES",
+                    color = PrimaryRed,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.5.sp
+                )
+            }
+            Text(
+                text = "View All >",
+                color = TextGray,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.05f)),
+            colors = CardDefaults.cardColors(containerColor = CardColor)
+        ) {
+            Column {
+                DeviceItem("Android Device", "SM-A528B • Android 13", "Online", "12:28 PM", true)
+                HorizontalDivider(color = Color.White.copy(alpha = 0.05f))
+                DeviceItem("Redmi Note 10", "M2101K7AI • Android 12", "Online", "12:10 PM", true)
+                HorizontalDivider(color = Color.White.copy(alpha = 0.05f))
+                DeviceItem("Samsung S20", "SM-G981B • Android 11", "Offline", "2 days ago", false)
+            }
+        }
+    }
+}
+
+@Composable
+private fun DeviceItem(
+    name: String,
+    model: String,
+    status: String,
+    time: String,
+    isOnline: Boolean
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Status Dot
+        Box(
+            modifier = Modifier
+                .size(8.dp)
+                .clip(CircleShape)
+                .background(if (isOnline) OnlineGreen else OfflineRed)
+        )
+        
+        Spacer(modifier = Modifier.width(12.dp))
+
+        // Device Icon
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .clip(CircleShape)
+                .background(Color.White.copy(alpha = 0.05f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Android,
+                contentDescription = null,
+                tint = PrimaryRed,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        // Device Info
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = name,
+                color = TextWhite,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = model,
+                color = TextGray,
+                fontSize = 10.sp
+            )
+        }
+
+        // Status and More Menu
+        Column(horizontalAlignment = Alignment.End) {
+            Text(
+                text = status,
+                color = if (isOnline) OnlineGreen else OfflineRed,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = time,
+                color = TextGray,
+                fontSize = 10.sp
+            )
+        }
+        
+        Spacer(modifier = Modifier.width(4.dp))
+        
+        Icon(
+            imageVector = Icons.Outlined.MoreVert,
+            contentDescription = null,
+            tint = TextGray,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+// ============================================================
 // OTHER COMPONENTS
 // ============================================================
 
@@ -437,14 +585,138 @@ private fun StatItemWithDot(dotColor: Color, label: String, value: String) {
         }
     }
 }
-
 @Composable
-private fun RecentDevicesSection() {
-    Box(modifier = Modifier.fillMaxWidth().height(200.dp).background(CardColor)) {
-        Text("Recent Devices Placeholder", color = TextGray, modifier = Modifier.align(Alignment.Center))
-    }
-}
+private fun BottomNavigationBar() {
 
+    Surface(
+
+        modifier = Modifier.fillMaxWidth(),
+
+        color = CardColor,
+
+        shadowElevation = 12.dp,
+
+        shape = RoundedCornerShape(
+            topStart = 22.dp,
+            topEnd = 22.dp
+        )
+
+    ) {
+
+        Row(
+
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 12.dp,
+                    vertical = 14.dp
+                ),
+
+            horizontalArrangement = Arrangement.SpaceEvenly,
+
+            verticalAlignment = Alignment.CenterVertically
+
+        ) {
+
+            BottomNavItem(
+                icon = Icons.Default.Home,
+                title = "Home",
+                selected = true
+            )
+
+            BottomNavItem(
+                icon = Icons.Default.PhoneAndroid,
+                title = "Devices",
+                selected = false
+            )
+
+            Card(
+
+                shape = CircleShape,
+
+                colors = CardDefaults.cardColors(
+                    containerColor = PrimaryRed
+                ),
+
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 8.dp
+                )
+
+            ) {
+
+                Image(
+
+                    painter = painterResource(id = R.drawable.splash_image),
+
+                    contentDescription = null,
+
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .size(42.dp)
+
+                )
+
+            }
+
+            BottomNavItem(
+                icon = Icons.Default.Description,
+                title = "Logs",
+                selected = false
+            )
+
+            BottomNavItem(
+                icon = Icons.Default.Settings,
+                title = "Settings",
+                selected = false
+            )
+
+        }
+
+    }
+
+}
+@Composable
+private fun BottomNavItem(
+
+    icon: ImageVector,
+
+    title: String,
+
+    selected: Boolean
+
+) {
+
+    Column(
+
+        horizontalAlignment = Alignment.CenterHorizontally
+
+    ) {
+
+        Icon(
+
+            imageVector = icon,
+
+            contentDescription = title,
+
+            tint = if (selected) PrimaryRed else TextGray
+
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+
+            text = title,
+
+            color = if (selected) PrimaryRed else TextGray,
+
+            fontSize = 11.sp
+
+        )
+
+    }
+
+}
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
