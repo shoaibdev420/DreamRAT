@@ -5,32 +5,35 @@ package com.example.dreamrat.screens
 // File        : HomeScreen.kt
 // Purpose     : Main Dashboard Screen
 //
-// Current Status: UI Overhaul to match reference image.
+// Current Status: UI Finalization - Exact Match to Reference Image
+// Features    : Scroll-aware Floating Bottom Navigation Bar (Pill Shape)
 // ============================================================
-import androidx.compose.foundation.Image
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.PhoneAndroid
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Surface
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.filled.Android
-import androidx.compose.material.icons.filled.Smartphone
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Chat
+import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
@@ -43,35 +46,51 @@ import androidx.compose.ui.unit.sp
 import com.example.dreamrat.R
 
 // ============================================================
-// COLORS - MATCHING REFERENCE IMAGE
+// COLORS - MATCHING REFERENCE IMAGE EXACTLY
 // ============================================================
 
 private val BackgroundColor = Color(0xFF000000) // Deep Black
-private val CardColor = Color(0xFF080808)       // Very dark grey for cards
-private val PrimaryRed = Color(0xFFFF0000)      // Pure Red for accents
+private val CardColor = Color(0xFF0A0A0A)       // Premium dark gray for pill bar
+private val PrimaryRed = Color(0xFFFF0000)      // Pure Red
 private val BorderRed = Color(0xFFFF0000).copy(alpha = 0.3f)
 private val OnlineGreen = Color(0xFF3DDC84)
 private val OfflineRed = Color(0xFFFF5252)
 private val TextWhite = Color.White
-private val TextGray = Color(0xFF808080)
+private val TextGray = Color(0xFF999999)
 
 @Composable
 fun HomeScreen() {
+    val lazyListState = rememberLazyListState()
+    var isBottomBarVisible by remember { mutableStateOf(true) }
+
+    // Smooth Scroll-aware visibility logic
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (available.y < -12) {
+                    isBottomBarVisible = false
+                } else if (available.y > 12) {
+                    isBottomBarVisible = true
+                }
+                return Offset.Zero
+            }
+        }
+    }
+
     Scaffold(
+        modifier = Modifier.nestedScroll(nestedScrollConnection),
         containerColor = BackgroundColor,
-                bottomBar = {
-            BottomNavigationBar()
+        bottomBar = {
+            BottomNavigationBar(isVisible = isBottomBarVisible)
         }
     ) { padding ->
         LazyColumn(
+            state = lazyListState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
             contentPadding = PaddingValues(
-                start = 16.dp,
-                top = 16.dp,
-                end = 16.dp,
-                bottom = 100.dp
+                start = 16.dp, top = 16.dp, end = 16.dp, bottom = 120.dp
             ),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
@@ -120,10 +139,6 @@ private fun TopBar() {
         }
     }
 }
-
-// ============================================================
-// DEVICE OVERVIEW CARD
-// ============================================================
 
 @Composable
 private fun DeviceOverviewCard() {
@@ -227,10 +242,6 @@ private fun DeviceOverviewCard() {
     }
 }
 
-// ============================================================
-// QUICK ACTIONS SECTION
-// ============================================================
-
 @Composable
 private fun QuickActionsSection() {
     Column {
@@ -251,7 +262,7 @@ private fun QuickActionsSection() {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ActionCard(Icons.Outlined.Visibility, "Live Screen", "View Live")
-                ActionCard(Icons.Outlined.Chat, "Remote Chat", "Start Chat")
+                ActionCard(Icons.AutoMirrored.Outlined.Chat, "Remote Chat", "Start Chat")
                 ActionCard(Icons.Outlined.PhotoCamera, "Camera", "Take Photo")
                 ActionCard(Icons.Outlined.Mic, "Microphone", "Listen Live")
                 ActionCard(Icons.Outlined.FolderOpen, "File Manager", "Browse Files")
@@ -272,15 +283,15 @@ private fun RowScope.ActionCard(icon: ImageVector, title: String, subtitle: Stri
     Card(
         modifier = Modifier
             .weight(1f)
-            .height(85.dp),
-        shape = RoundedCornerShape(8.dp),
+            .height(82.dp),
+        shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = CardColor),
-        border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.1f))
+        border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.08f))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(2.dp),
+                .padding(4.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -288,7 +299,7 @@ private fun RowScope.ActionCard(icon: ImageVector, title: String, subtitle: Stri
                 imageVector = icon,
                 contentDescription = null,
                 tint = PrimaryRed,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(18.dp)
             )
             
             Spacer(modifier = Modifier.height(4.dp))
@@ -296,7 +307,7 @@ private fun RowScope.ActionCard(icon: ImageVector, title: String, subtitle: Stri
             Text(
                 text = title,
                 color = TextWhite,
-                fontSize = 9.sp,
+                fontSize = 8.5.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 lineHeight = 10.sp,
@@ -307,7 +318,7 @@ private fun RowScope.ActionCard(icon: ImageVector, title: String, subtitle: Stri
             Text(
                 text = subtitle,
                 color = TextGray,
-                fontSize = 8.sp,
+                fontSize = 7.sp,
                 textAlign = TextAlign.Center,
                 lineHeight = 9.sp,
                 maxLines = 1,
@@ -316,10 +327,6 @@ private fun RowScope.ActionCard(icon: ImageVector, title: String, subtitle: Stri
         }
     }
 }
-
-// ============================================================
-// ACTIVITY OVERVIEW SECTION
-// ============================================================
 
 @Composable
 private fun ActivityOverviewSection() {
@@ -354,10 +361,10 @@ private fun ActivityOverviewSection() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            ActivityCard(Icons.Outlined.Send, "Sent", "2.45 MB", "↑ 12%", PrimaryRed)
+            ActivityCard(Icons.AutoMirrored.Outlined.Send, "Sent", "2.45 MB", "↑ 12%", PrimaryRed)
             ActivityCard(Icons.Outlined.FileDownload, "Received", "5.32 MB", "↓ 8%", Color(0xFFFFB74D))
             ActivityCard(Icons.Outlined.Call, "Calls", "24", "↑ 5%", OnlineGreen)
-            ActivityCard(Icons.Outlined.Chat, "SMS", "36", "↑ 3%", Color(0xFF4DD0E1))
+            ActivityCard(Icons.AutoMirrored.Outlined.Chat, "SMS", "36", "↑ 3%", Color(0xFF4DD0E1))
         }
     }
 }
@@ -371,49 +378,63 @@ private fun RowScope.ActivityCard(
     iconColor: Color
 ) {
     Card(
-        modifier = Modifier.weight(1f).height(105.dp),
-        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier
+            .weight(1f)
+            .height(98.dp),
+        shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = CardColor),
-        border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.1f))
+        border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.08f))
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(8.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 10.dp, top = 10.dp, end = 10.dp, bottom = 8.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .size(28.dp)
+                    .size(26.dp)
                     .clip(CircleShape)
-                    .background(iconColor.copy(alpha = 0.15f)),
+                    .background(iconColor.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
                     tint = iconColor,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(14.dp)
                 )
             }
             
-            Column {
-                Text(text = label, color = TextGray, fontSize = 9.sp)
+            Spacer(modifier = Modifier.weight(1f))
+            
+            Column(
+                verticalArrangement = Arrangement.spacedBy(0.dp)
+            ) {
+                Text(
+                    text = label,
+                    color = TextGray,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = 0.2.sp
+                )
                 Text(
                     text = value,
                     color = TextWhite,
-                    fontSize = 12.sp,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Text(text = trend, color = iconColor, fontSize = 8.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    text = trend,
+                    color = iconColor,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
         }
     }
 }
-
-// ============================================================
-// RECENT DEVICES SECTION - EXACT MATCH TO IMAGE
-// ============================================================
 
 @Composable
 private fun RecentDevicesSection() {
@@ -475,7 +496,6 @@ private fun DeviceItem(
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Status Dot
         Box(
             modifier = Modifier
                 .size(8.dp)
@@ -485,7 +505,6 @@ private fun DeviceItem(
         
         Spacer(modifier = Modifier.width(12.dp))
 
-        // Device Icon
         Box(
             modifier = Modifier
                 .size(36.dp)
@@ -503,22 +522,11 @@ private fun DeviceItem(
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        // Device Info
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = name,
-                color = TextWhite,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = model,
-                color = TextGray,
-                fontSize = 10.sp
-            )
+            Text(text = name, color = TextWhite, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            Text(text = model, color = TextGray, fontSize = 10.sp)
         }
 
-        // Status and More Menu
         Column(horizontalAlignment = Alignment.End) {
             Text(
                 text = status,
@@ -526,11 +534,7 @@ private fun DeviceItem(
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold
             )
-            Text(
-                text = time,
-                color = TextGray,
-                fontSize = 10.sp
-            )
+            Text(text = time, color = TextGray, fontSize = 10.sp)
         }
         
         Spacer(modifier = Modifier.width(4.dp))
@@ -543,10 +547,6 @@ private fun DeviceItem(
         )
     }
 }
-
-// ============================================================
-// OTHER COMPONENTS
-// ============================================================
 
 @Composable
 private fun StatItem(icon: ImageVector, label: String, value: String, valueColor: Color) {
@@ -585,138 +585,110 @@ private fun StatItemWithDot(dotColor: Color, label: String, value: String) {
         }
     }
 }
+
+// ============================================================
+// FINALIZED BOTTOM NAVIGATION BAR - PERFECT PILL MATCH
+// ============================================================
+
 @Composable
-private fun BottomNavigationBar() {
-
-    Surface(
-
-        modifier = Modifier.fillMaxWidth(),
-
-        color = CardColor,
-
-        shadowElevation = 12.dp,
-
-        shape = RoundedCornerShape(
-            topStart = 22.dp,
-            topEnd = 22.dp
-        )
-
+private fun BottomNavigationBar(isVisible: Boolean = true) {
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = slideInVertically(
+            initialOffsetY = { it },
+            animationSpec = tween(durationMillis = 400)
+        ) + fadeIn(),
+        exit = slideOutVertically(
+            targetOffsetY = { it },
+            animationSpec = tween(durationMillis = 400)
+        ) + fadeOut(),
     ) {
-
-        Row(
-
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    horizontal = 12.dp,
-                    vertical = 14.dp
-                ),
-
-            horizontalArrangement = Arrangement.SpaceEvenly,
-
-            verticalAlignment = Alignment.CenterVertically
-
+                .wrapContentHeight()
+                .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+            contentAlignment = Alignment.BottomCenter
         ) {
-
-            BottomNavItem(
-                icon = Icons.Default.Home,
-                title = "Home",
-                selected = true
-            )
-
-            BottomNavItem(
-                icon = Icons.Default.PhoneAndroid,
-                title = "Devices",
-                selected = false
-            )
-
-            Card(
-
-                shape = CircleShape,
-
-                colors = CardDefaults.cardColors(
-                    containerColor = PrimaryRed
-                ),
-
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 8.dp
-                )
-
+            // Pill-shaped Main Container - Matches reference image perfectly
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp),
+                color = CardColor,
+                shadowElevation = 24.dp,
+                shape = RoundedCornerShape(32.dp), // Perfectly pill shaped
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
             ) {
-
-                Image(
-
-                    painter = painterResource(id = R.drawable.splash_image),
-
-                    contentDescription = null,
-
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(42.dp)
-
-                )
-
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    BottomNavItem(Icons.Default.GridView, "Dashboard", true, Modifier.weight(1f))
+                    BottomNavItem(Icons.Default.PhoneAndroid, "Devices", false, Modifier.weight(1f))
+                    
+                    // Spacer for the Floating Action Button center space
+                    Spacer(modifier = Modifier.weight(0.9f))
+                    
+                    BottomNavItem(Icons.Default.Description, "Logs", false, Modifier.weight(1f))
+                    BottomNavItem(Icons.Default.Settings, "Settings", false, Modifier.weight(1f))
+                }
             }
 
-            BottomNavItem(
-                icon = Icons.Default.Description,
-                title = "Logs",
-                selected = false
-            )
-
-            BottomNavItem(
-                icon = Icons.Default.Settings,
-                title = "Settings",
-                selected = false
-            )
-
+            // Floating Center Button - Logo with Glow (Background removed to match reference)
+            Box(
+                modifier = Modifier
+                    .offset(y = (-5).dp)
+                    .size(76.dp) 
+                    // Keeping the shadow for the red glow effect seen in reference
+                    .shadow(20.dp, CircleShape, spotColor = PrimaryRed, ambientColor = PrimaryRed)
+                    .clickable { },
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.navigation_image),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxSize(), // Logo fills the space like reference
+                    contentScale = ContentScale.Fit
+                )
+            }
         }
-
     }
-
 }
+
 @Composable
 private fun BottomNavItem(
-
     icon: ImageVector,
-
     title: String,
-
-    selected: Boolean
-
+    selected: Boolean,
+    modifier: Modifier = Modifier
 ) {
-
     Column(
-
-        horizontalAlignment = Alignment.CenterHorizontally
-
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-
         Icon(
-
             imageVector = icon,
-
             contentDescription = title,
-
-            tint = if (selected) PrimaryRed else TextGray
-
+            tint = if (selected) PrimaryRed else TextGray,
+            modifier = Modifier.size(24.dp)
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(3.dp))
 
         Text(
-
             text = title,
-
             color = if (selected) PrimaryRed else TextGray,
-
-            fontSize = 11.sp
-
+            fontSize = 10.sp,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+            maxLines = 1
         )
-
     }
-
 }
+
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
