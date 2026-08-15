@@ -5,7 +5,7 @@ package com.example.dreamrat.screens
 // File        : HomeScreen.kt
 // Purpose     : Main Dashboard Screen
 //
-// Current Status: UI Finalization - Exact Match to Reference Image
+// Current Status: UI Refactored - Quick Actions Extracted
 // Features    : Scroll-aware Floating Bottom Navigation Bar (Pill Shape)
 // ============================================================
 
@@ -44,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dreamrat.R
+import com.example.dreamrat.features.home.quick_action.QuickAction
 
 // ============================================================
 // COLORS - MATCHING REFERENCE IMAGE EXACTLY
@@ -96,7 +97,7 @@ fun HomeScreen() {
         ) {
             item { TopBar() }
             item { DeviceOverviewCard() }
-            item { QuickActionsSection() }
+            item { QuickAction() } // Using the extracted component
             item { ActivityOverviewSection() }
             item { RecentDevicesSection() }
             item { Spacer(modifier = Modifier.height(20.dp)) }
@@ -238,92 +239,6 @@ private fun DeviceOverviewCard() {
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun QuickActionsSection() {
-    Column {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(PrimaryRed))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "QUICK ACTIONS",
-                color = PrimaryRed,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 0.5.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ActionCard(Icons.Outlined.Visibility, "Live Screen", "View Live")
-                ActionCard(Icons.AutoMirrored.Outlined.Chat, "Remote Chat", "Start Chat")
-                ActionCard(Icons.Outlined.PhotoCamera, "Camera", "Take Photo")
-                ActionCard(Icons.Outlined.Mic, "Microphone", "Listen Live")
-                ActionCard(Icons.Outlined.FolderOpen, "File Manager", "Browse Files")
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ActionCard(Icons.Outlined.LocationOn, "Location", "Track Device")
-                ActionCard(Icons.Outlined.Lock, "Lock Device", "Lock Now")
-                ActionCard(Icons.Outlined.NotificationsActive, "Send Alert", "Notify Device")
-                ActionCard(Icons.Outlined.DeleteOutline, "Clear Data", "Clear All")
-                ActionCard(Icons.Outlined.Settings, "More Tools", "Advanced")
-            }
-        }
-    }
-}
-
-@Composable
-private fun RowScope.ActionCard(icon: ImageVector, title: String, subtitle: String) {
-    Card(
-        modifier = Modifier
-            .weight(1f)
-            .height(82.dp),
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(containerColor = CardColor),
-        border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.08f))
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(4.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = PrimaryRed,
-                modifier = Modifier.size(18.dp)
-            )
-            
-            Spacer(modifier = Modifier.height(4.dp))
-            
-            Text(
-                text = title,
-                color = TextWhite,
-                fontSize = 8.5.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                lineHeight = 10.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            
-            Text(
-                text = subtitle,
-                color = TextGray,
-                fontSize = 7.sp,
-                textAlign = TextAlign.Center,
-                lineHeight = 9.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
         }
     }
 }
