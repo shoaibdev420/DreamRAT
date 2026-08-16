@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.dreamrat.ui.theme.DreamRATTheme
 
-private val activity: Any = TODO()
 
 class MainActivity : ComponentActivity() {
 

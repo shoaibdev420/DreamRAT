@@ -2,6 +2,7 @@ package com.example.dreamrat.features.home.quick_action
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,7 +34,7 @@ private val TextWhite = Color.White
 private val TextGray = Color(0xFF999999)
 
 @Composable
-fun QuickAction() {
+fun QuickAction(onLocationClick: () -> Unit = {}) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
@@ -63,7 +64,7 @@ fun QuickAction() {
                 ActionCard(Icons.Outlined.FolderOpen, "File Manager", "Browse Files")
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ActionCard(Icons.Outlined.LocationOn, "Location", "Track Device")
+                ActionCard(Icons.Outlined.LocationOn, "Location", "Track Device", onClick = onLocationClick)
                 ActionCard(Icons.Outlined.Lock, "Lock Device", "Lock Now")
                 ActionCard(Icons.Outlined.NotificationsActive, "Send Alert", "Notify Device")
                 ActionCard(Icons.Outlined.DeleteOutline, "Clear Data", "Clear All")
@@ -74,11 +75,17 @@ fun QuickAction() {
 }
 
 @Composable
-private fun RowScope.ActionCard(icon: ImageVector, title: String, subtitle: String) {
+private fun RowScope.ActionCard(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit = {}
+) {
     Card(
         modifier = Modifier
             .weight(1f)
-            .height(82.dp),
+            .height(82.dp)
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = CardColor),
         border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.08f))

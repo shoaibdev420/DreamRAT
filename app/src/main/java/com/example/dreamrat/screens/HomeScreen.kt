@@ -60,7 +60,7 @@ private val TextWhite = Color.White
 private val TextGray = Color(0xFF999999)
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(onNavigateToLocation: () -> Unit = {}) {
     val lazyListState = rememberLazyListState()
     var isBottomBarVisible by remember { mutableStateOf(true) }
 
@@ -97,7 +97,7 @@ fun HomeScreen() {
         ) {
             item { TopBar() }
             item { DeviceOverviewCard() }
-            item { QuickAction() } // Using the extracted component
+            item { QuickAction(onLocationClick = onNavigateToLocation) } // Using the extracted component
             item { ActivityOverviewSection() }
             item { RecentDevicesSection() }
             item { Spacer(modifier = Modifier.height(20.dp)) }
