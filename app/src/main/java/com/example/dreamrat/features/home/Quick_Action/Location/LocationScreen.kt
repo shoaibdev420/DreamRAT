@@ -1,5 +1,6 @@
 package com.example.dreamrat.features.home.quick_action.location
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,9 +23,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.dreamrat.R
+import com.example.dreamrat.screens.HomeScreen
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -41,12 +44,24 @@ private val TextWhite = Color.White
 private val TextGray = Color(0xFF999999)
 private val OnlineGreen = Color(0xFF3DDC84)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationScreen(onBackClick: () -> Unit = {}) {
+    // Handle physical back button
+    BackHandler {
+        onBackClick()
+    }
+
     val dummyLocation = LatLng(33.6844, 73.0479) // Islamabad center
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(dummyLocation, 15f)
     }
+
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberStandardBottomSheetState(
+            initialValue = SheetValue.PartiallyExpanded
+        )
+    )
 
     val mapProperties by remember {
         mutableStateOf(
@@ -65,13 +80,30 @@ fun LocationScreen(onBackClick: () -> Unit = {}) {
         )
     }
 
-    Scaffold(
-        containerColor = BackgroundColor,
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = 70.dp,
+        sheetContainerColor = CardColor,
+        sheetContentColor = TextWhite,
+        sheetShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+        sheetDragHandle = {
+            BottomSheetDefaults.DragHandle(
+                color = Color.DarkGray,
+                width = 40.dp,
+                height = 4.dp
+            )
+        },
         topBar = {
             LocationTopBar(onBackClick)
-        }
+        },
+        sheetContent = {
+            ChildDetailSheetContent()
+        },
+        containerColor = BackgroundColor
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)) {
             GoogleMap(
                 modifier = Modifier.fillMaxSize(),
                 cameraPositionState = cameraPositionState,
@@ -105,16 +137,18 @@ fun LocationScreen(onBackClick: () -> Unit = {}) {
                 }
             }
 
-            LiveTrackingOverlay(modifier = Modifier.align(Alignment.TopCenter).padding(top = 16.dp))
+            LiveTrackingOverlay(modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 16.dp))
 
             MapActionButtons(
-                modifier = Modifier.align(Alignment.CenterEnd).padding(end = 16.dp),
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 16.dp, bottom = 24.dp), // Positioned above the peek area
                 onRecenter = {
                     cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(dummyLocation, 15f))
                 }
             )
-
-            ChildDetailBottomCard(modifier = Modifier.align(Alignment.BottomCenter))
         }
     }
 }
@@ -122,7 +156,10 @@ fun LocationScreen(onBackClick: () -> Unit = {}) {
 @Composable
 private fun LocationTopBar(onBackClick: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(BackgroundColor)
+            .padding(horizontal = 8.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onBackClick) {
@@ -144,15 +181,22 @@ private fun LocationTopBar(onBackClick: () -> Unit) {
 @Composable
 private fun LiveTrackingOverlay(modifier: Modifier = Modifier) {
     Surface(
-        modifier = modifier.fillMaxWidth(0.9f).height(54.dp),
+        modifier = modifier
+            .fillMaxWidth(0.9f)
+            .height(54.dp),
         shape = RoundedCornerShape(12.dp),
         color = CardColor.copy(alpha = 0.9f)
     ) {
         Row(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(OnlineGreen))
+            Box(modifier = Modifier
+                .size(8.dp)
+                .clip(CircleShape)
+                .background(OnlineGreen))
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text("Live Tracking", color = TextWhite, fontSize = 12.sp, fontWeight = FontWeight.Bold)
@@ -169,7 +213,9 @@ private fun LiveTrackingOverlay(modifier: Modifier = Modifier) {
 private fun MapActionButtons(modifier: Modifier = Modifier, onRecenter: () -> Unit) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Surface(
-            modifier = Modifier.size(42.dp).clickable { onRecenter() },
+            modifier = Modifier
+                .size(42.dp)
+                .clickable { onRecenter() },
             color = CardColor,
             shape = RoundedCornerShape(8.dp),
             border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
@@ -198,67 +244,70 @@ private fun MapActionButtons(modifier: Modifier = Modifier, onRecenter: () -> Un
 }
 
 @Composable
-private fun ChildDetailBottomCard(modifier: Modifier = Modifier) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = CardColor,
-        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
+private fun ChildDetailSheetContent() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp, bottom = 32.dp)
     ) {
-        Column(modifier = Modifier.padding(top = 12.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)) {
-            Box(modifier = Modifier.width(40.dp).height(4.dp).clip(CircleShape).background(Color.DarkGray).align(Alignment.CenterHorizontally))
-            Spacer(modifier = Modifier.height(16.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(id = R.drawable.splash_image),
-                    contentDescription = null,
-                    modifier = Modifier.size(52.dp).clip(CircleShape).background(Color.DarkGray),
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Ali Hassan", color = TextWhite, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                    Text("SM-A528B", color = TextGray, fontSize = 12.sp)
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(OnlineGreen))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Online", color = OnlineGreen, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
+        // Handle is already provided by BottomSheetScaffold
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource(id = R.drawable.splash_image),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(52.dp)
+                    .clip(CircleShape)
+                    .background(Color.DarkGray),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Ali Hassan", color = TextWhite, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("SM-A528B", color = TextGray, fontSize = 12.sp)
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.BatteryFull, contentDescription = null, tint = OnlineGreen, modifier = Modifier.size(20.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("75%", color = TextWhite, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                    Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, tint = TextGray)
+                    Box(modifier = Modifier
+                        .size(6.dp)
+                        .clip(CircleShape)
+                        .background(OnlineGreen))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Online", color = OnlineGreen, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
             }
-            Spacer(modifier = Modifier.height(20.dp))
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = Color.Black.copy(alpha = 0.3f),
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.05f))
-            ) {
-                Row(modifier = Modifier.padding(12.dp)) {
-                    Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = PrimaryRed, modifier = Modifier.size(20.dp))
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("Current Location", color = PrimaryRed, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                            Text("Just now", color = TextGray, fontSize = 11.sp)
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text("F-10 Markaz, Islamabad,\nIslamabad Capital Territory, Pakistan", color = TextWhite, fontSize = 13.sp, lineHeight = 18.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.BatteryFull, contentDescription = null, tint = OnlineGreen, modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("75%", color = TextWhite, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, tint = TextGray)
+            }
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = Color.Black.copy(alpha = 0.3f),
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(0.5.dp, Color.White.copy(alpha = 0.05f))
+        ) {
+            Row(modifier = Modifier.padding(12.dp)) {
+                Icon(Icons.Outlined.LocationOn, contentDescription = null, tint = PrimaryRed, modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("Current Location", color = PrimaryRed, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text("Just now", color = TextGray, fontSize = 11.sp)
                     }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("F-10 Markaz, Islamabad,\nIslamabad Capital Territory, Pakistan", color = TextWhite, fontSize = 13.sp, lineHeight = 18.sp)
                 }
             }
-            Spacer(modifier = Modifier.height(20.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                BottomActionItem(Icons.Outlined.Route, "Location History", Modifier.weight(1f))
-                BottomActionItem(Icons.Outlined.NearMe, "Navigate", Modifier.weight(1f))
-                BottomActionItem(Icons.Outlined.Security, "Safe Zones", Modifier.weight(1f))
-                BottomActionItem(Icons.Outlined.Share, "Share Location", Modifier.weight(1f))
-            }
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BottomActionItem(Icons.Outlined.Route, "Location History", Modifier.weight(1f))
+            BottomActionItem(Icons.Outlined.NearMe, "Navigate", Modifier.weight(1f))
+            BottomActionItem(Icons.Outlined.Security, "Safe Zones", Modifier.weight(1f))
+            BottomActionItem(Icons.Outlined.Share, "Share Location", Modifier.weight(1f))
         }
     }
 }
@@ -277,4 +326,9 @@ private fun BottomActionItem(icon: ImageVector, label: String, modifier: Modifie
             Text(text = label, color = TextWhite, fontSize = 9.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Medium, lineHeight = 11.sp)
         }
     }
+}
+@Preview(showBackground = true)
+@Composable
+private fun LocaationScreenPreview() {
+    LocationScreen()
 }
